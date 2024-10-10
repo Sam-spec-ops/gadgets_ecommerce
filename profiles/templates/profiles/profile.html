@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% load mathfilters %}
+
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static "profiles/css/profiles.css" %}">
+{% endblock extra_css %}
+
+{% block content %}
+
+<div class="container dark-green">
+    <div class="row">
+        <div class="col-12 header-container d-flex justify-content-center text-uppercase">
+            <h1 class="logo-font mt-4 m-2">My Profile</h1>
+        </div>
+    </div>
+    {% if favorites %}
+        <div class="row">
+            <p class="text-muted">Favorites</p>
+            <div class="col-12">
+                <table class="table caption-top table-responsive table-sm mb-3">
+                    <thead>
+                        <tr>
+                            <th class="ps-4 text-start">Image</th>
+                            <th class="text-start">Name</th>
+                            <th class="text-start d-none d-sm-table-cell">Price</th>
+                            <th>Remove</th>
+                            <th>Add to Cart</th>
+
+                        </tr>
+                    </thead>
+                        <tbody>
+                            {% for favorite in favorites %}
+                                <tr>
+                                    <td class="p-3 position-relative">
+                                        {% if favorite.image1 %}
+                                            {% if favorite.on_sale %}
+                                                <img class="admin-img" src="{{ favorite.image1.url }}" alt="{{ favorite.name }}">
+                                                <div class="sale-banner-admin">SALE</div>
+                                            {% else %}
+                                                <img class="admin-img" src="{{ favorite.image1.url }}" alt="{{ favorite.name }}">
+                                            {% endif %}
+                                        {% else %}
+                                            <img class="admin-img" src="{{ MEDIA_URL }}noimage.webp" alt="{{ favorite.name }}">
+                                        {% endif %}
+                                    </td>
+                                    <td class="align-middle small">
+                                        <a class="dark-green small" href="{% url "product_detail" favorite.id %}">{{ favorite.name }}</a>
+                                    </td>
+                                    {% if favorite.on_sale %}
+                                        <td class="align-middle small d-none d-sm-table-cell"><span class="px-1 ms-2 bg-danger small text-light">SALE</span><br><strong class="text-danger">€{{ favorite.sale_price }}</strong></td>
+                                    {% else %}
+                                        <td class="align-middle small d-none d-sm-table-cell"><strong>€{{ favorite.price }}</strong></td>
+                                    {% endif %}
+                                    <td class="align-middle text-center"><a class="border border-danger px-2 py-1 rounded-2 bg-danger text-light fa-sm" aria-label="remove from favorites" href="{% url "favorites_add" favorite.id %}"><i class="fa-solid fa-heart-crack"></i></a></td>
+                                    <td class="align-middle text-center"><a class="border border-success px-2 py-1 rounded-2 bg-primary text-light fa-sm" aria-label="Add to cart" href="{% url "product_detail" favorite.id %}"><i class="fa-solid fa-cart-plus"></i></a></td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+            </div>
+        </div>
+    {% endif %}
+    <br>
+    <div class="row d-flex justify-content-center">
+        <div class="green col-12 col-lg-6">
+            <p class="text-muted">Default Delivery Informattion</p>
+            <form action="{% url "profile" %}" method="POST" class="mt-3 mb-3" id="profile-update-form">
+                {% csrf_token %}
+                {{ form|crispy }}
+                <button type="submit" class="btn keep-shopping-btn rounded text-uppercase">Update Information</button>
+            </form>
+        </div>
+        <div class="col-12 col-lg-6">
+            <p class="text-muted">Order History</p>
+            <div class="order-history table-responsive">
+                <table class="table caption-top table-sm table-borderless">
+                    <thead>
+                        <tr>
+                            <th>Order Number</th>
+                            <th>Date</th>
+                            <th>Items</th>
+                            <th>Order Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in orders %}
+                            <tr>
+                                <td>
+                                    <a class="dark-green" href="{% url "order_history" order.order_number %}" title="{{ order.order_number }}">{{ order.order_number|truncatechars:6 }}</a>
+                                </td>
+                                <td>{{ order.date }}</td>
+                                <td>
+                                    <ul class="list-unstyled">
+                                        {% for item in order.lineitems.all %}
+                                            <li class="small">
+                                                {% if item.product.has_sizes %}
+                                                    Size {{ item.product_size }}
+                                                {% endif %}{{ item.product.name }} x {{ item.quantity }}
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                </td>
+                                <td>{{ order.grand_total }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{{ profile }}
+<a role="button" class="btn btt-button d-flex d-none shadow-sm rounded-1">
+    <i class="fas fa-arrow-up mx-auto my-auto"></i>
+</a>
+
+{% endblock  %}

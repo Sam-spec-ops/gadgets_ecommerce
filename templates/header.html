@@ -1,0 +1,99 @@
+<header class="container-fluid fixed-top">
+    <div class="row navbar-upper">
+        <div class="col-8">
+            <form class="d-none d-lg-flex m-1" role="search" method="GET" action="{% url "products" %}">
+                <input id="q" class="search form-control me-2" type="search" value="{{ search_term }}" placeholder="Search products..." name="q" aria-label="Search">
+                <button class="search-btn" type="submit">Search</button>
+            </form>
+        </div>
+        <div class="col-4 login-box">
+            <div class="d-flex justify-content-end align-items-center text-end text-nowrap">
+                {% if request.user.is_authenticated %}
+                <span class="d-none d-sm-inline">Logged in as:</span><a href="{% url "profile" %}" class="login-link"> <span class="text-decoration-underline">{{ request.user.username}}</span></a> <span class="ms-2 me-2">|</span> <a href="{% url 'account_logout' %}" class="login-link">Logout</a>
+                {% else %}
+                    <a class="login-link" href="{% url "account_login" %}?next={{ request.get_full_path|urlencode }}">Login</a> <span class="ms-2 me-2">|</span> <a class="login-link" href="{% url "account_signup" %}?next={{ request.path }}">Signup</a>
+                {% endif %}
+                <a class="cart ms-2 text-center" href="{% url "cart" %}"><i class="mt-1 fa-solid fa-cart-plus dark-green"></i> €{% if grand_total %}{{ grand_total|floatformat:2 }}{% else %}0.00{% endif %}</a>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <nav class="navbar navbar-expand-xl bg-body-tertiary m-0 p-0">
+            <div class="container-fluid navbar-lower d-flex align-items-center">
+                <div class="col-4">
+                    <a class="navbar-brand text-light logo-text ms-2 fs-1" href="{% url "home" %}">Vel{% if request %}<i class="spinning-icon fa-solid fa-circle-xmark fa-spin fa-2xs"></i>{% else %}o{% endif %}Tr<i class="spinning-icon fa-solid fa-circle-xmark fa-spin fa-2xs"></i>nix</a>
+                </div>
+                <button class="navbar-toggler collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="toggler-icon top-bar"></span>
+                    <span class="toggler-icon middle-bar"></span>
+                    <span class="toggler-icon bottom-bar"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav p-2">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle ps-1" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        All Products
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a class="dropdown-item d-flex justify-content-between" href="{% url "products" %}?sort=popularity&direction=desc">By Viewed
+                                    <div class="text-end"><i class="text-end fa-solid fa-signal fa-flip-horizontal"></i></div>
+                                </a>
+                            </li>
+                            <li><a class="dropdown-item d-flex justify-content-between" href="{% url "products" %}?sort=price&direction=desc">By Price <i class="text-end fa-solid fa-signal fa-flip-horizontal"></i></a></li>
+                            <li><a class="dropdown-item d-flex justify-content-between" href="{% url "products" %}?sort=price&direction=esc">By Price <i class="text-end fa-solid fa-signal"></i></a></li>
+                            <li><a class="dropdown-item d-flex justify-content-between" href="{% url "products" %}?sort=brand&direction=asc">By Brand <span class="text-end"><i class="fa-solid fa-arrow-down-a-z"></i></span></a></li>
+                            <li><a class="dropdown-item d-flex justify-content-between" href="{% url "products" %}?sort=category&direction=asc">By Category <i class="fa-solid fa-arrow-down-a-z"></i></a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item d-flex justify-content-center" href="{% url "products" %}?on_sale">Sale Items</a></li>
+                            <li><a class="dropdown-item d-flex justify-content-center" href="{% url "products" %}">All products</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle ps-1" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Electronics
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{% url 'products' %}?category=bike_computers">Bike Computers</a></li>
+                            <li><a class="dropdown-item" href="{% url 'products' %}?category=power_meters">Power Meters</a></li>
+                            <li><a class="dropdown-item" href="{% url 'products' %}?category=bike_lights">Bike Lights</a></li>
+                            <li><a class="dropdown-item" href="{% url 'products' %}?category=wearable_tech">Wearable Tech</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle ps-1" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Accessories
+                        </a>
+                            <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{% url "products" %}?category=sensors">Sensors</a></li>
+                            <li><a class="dropdown-item" href="{% url "products" %}?category=heart_rate_monitors">Heart Rate Monitors</a></li>
+                        </ul>
+                    </li>
+                        <li class="nav-item">
+                            <a class="nav-link ps-1" href="{% url "about" %}">About Us</a>
+                        </li>
+                        {% if request.user.is_authenticated %}
+                            {% if request.user.is_staff %}
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle ps-1" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Product-Admin
+                                    </a>
+                                        <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" href="{% url "add_product" %}">Add Product</a></li>
+                                        <li><a class="dropdown-item" href="{% url "product_admin" %}">Edit/Delete Products</a></li>
+                                    </ul>
+                                </li>
+                            {% endif %}
+                        {% endif %}
+                        <li class="nav-item flex-grow-1">
+                            <form method="GET" action="{% url "products" %}" class="d-lg-none  m-1" role="search">
+                                <input class="search-burger form-control me-2" type="search" value="{{ search_term }}" placeholder="Search products..." name="q" aria-label="Search">
+                                <button class="search-btn-burger mt-2 mb-2" type="submit">Search</button>
+                            </form>
+                        </li>                    
+                    </ul>
+                </div>
+            </div>
+          </nav>
+    </div>
+</header>
